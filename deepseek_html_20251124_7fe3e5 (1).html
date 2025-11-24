@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Konten PMB 2026</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3a0ca3, #4361ee, #4cc9f0);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        
+        .nav-tabs {
+            background: white;
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto 30px;
+            max-width: 500px;
+            display: flex;
+        }
+        
+        .nav-tab {
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+            color: var(--dark);
+            text-decoration: none;
+        }
+        
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eaeaea;
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card.posts {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        }
+        
+        .stat-card.likes {
+            background: linear-gradient(135deg, #f72585, #b5179e);
+        }
+        
+        .stat-card.followers {
+            background: linear-gradient(135deg, #4cc9f0, #4895ef);
+        }
+        
+        .stat-card.views {
+            background: linear-gradient(135deg, #7209b7, #560bad);
+        }
+        
+        .stat-card.comments {
+            background: linear-gradient(135deg, #ff9e00, #ff6d00);
+        }
+        
+        .stat-card.saves {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+        
+        .stat-card.shares {
+            background: linear-gradient(135deg, #6c5ce7, #5649c9);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .badge-quality {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge-excellent {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-good {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .badge-fair {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-poor {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .table th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .analysis-result {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-container select {
+            flex: 1;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .profile-card {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .profile-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .followers-count {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+        
+        .profile-username {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .edit-followers-form {
+            max-width: 400px;
+            margin: 30px auto 0;
+        }
+        
+        .user-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-container {
+                flex-direction: column;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                border-radius: 10px;
+                max-width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .user-badge {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 15px;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form (Awal) -->
+    <div id="loginPage" class="login-container">
+        <h2 class="text-center mb-4"><i class="fas fa-lock me-2"></i>Login Sistem</h2>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Masukkan username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Masukkan password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+        </form>
+    </div>
+
+    <!-- Aplikasi Utama (Tersembunyi sampai login) -->
+    <div id="app" style="display: none;">
+        <!-- Header -->
+        <div class="header">
+            <div class="container text-center">
+                <div class="user-badge">
+                    <i class="fas fa-user me-1"></i>
+                    <span id="userRoleDisplay">User</span> | 
+                    <a href="#" id="logoutLink" class="text-white">Logout</a>
+                </div>
+                <h1><i class="fas fa-chart-line me-2"></i>Analisis Konten PMB 2026</h1>
+                <p>Sistem Analisis dan Pelacakan Kinerja Konten Digital</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs" id="navTabsContainer">
+                <a class="nav-tab active" href="#" data-page="page1">
+                    <i class="fas fa-pencil-alt me-2"></i>Entri Data
+                </a>
+                <a class="nav-tab" href="#" data-page="page2">
+                    <i class="fas fa-chart-bar me-2"></i>Rekap Data
+                </a>
+                <a class="nav-tab" href="#" data-page="page3">
+                    <i class="fas fa-cog me-2"></i>Pengaturan
+                </a>
+            </div>
+
+            <!-- Page 1: Data Entri Konten -->
+            <div id="page1" class="page active">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Form Entri Data Konten</h5>
+                        <i class="fas fa-pencil-alt text-primary"></i>
+                    </div>
+                    <div class="card-body">
+                        <form id="contentForm">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="day" class="form-label">Tanggal</label>
+                                    <select class="form-select" id="day" required>
+                                        <option value="">Pilih Tanggal</option>
+                                        <!-- Options for days 1-31 will be added by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="month" class="form-label">Bulan</label>
+                                    <select class="form-select" id="month" required>
+                                        <option value="">Pilih Bulan</option>
+                                        <option value="Januari">Januari</option>
+                                        <option value="Februari">Februari</option>
+                                        <option value="Maret">Maret</option>
+                                        <option value="April">April</option>
+                                        <option value="Mei">Mei</option>
+                                        <option value="Juni">Juni</option>
+                                        <option value="Juli">Juli</option>
+                                        <option value="Agustus">Agustus</option>
+                                        <option value="September">September</option>
+                                        <option value="Oktober">Oktober</option>
+                                        <option value="November">November</option>
+                                        <option value="Desember">Desember</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="year" class="form-label">Tahun</label>
+                                    <select class="form-select" id="year" required>
+                                        <option value="">Pilih Tahun</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="link" class="form-label">Link Konten</label>
+                                <input type="url" class="form-control" id="link" placeholder="https://example.com/konten" required>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="like" class="form-label">Jumlah Like</label>
+                                    <input type="number" class="form-control" id="like" placeholder="100" min="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="followers" class="form-label">Jumlah Penambahan Followers</label>
+                                    <input type="number" class="form-control" id="followers" placeholder="50" min="0" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="comments" class="form-label">Jumlah Komentar</label>
+                                    <input type="number" class="form-control" id="comments" placeholder="25" min="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="saves" class="form-label">Jumlah Save Konten</label>
+                                    <input type="number" class="form-control" id="saves" placeholder="15" min="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="shares" class="form-label">Jumlah Share Konten</label>
+                                    <input type="number" class="form-control" id="shares" placeholder="10" min="0" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="view" class="form-label">Jumlah View</label>
+                                    <input type="number" class="form-control" id="view" placeholder="1000" min="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="engagement" class="form-label">Tingkat Engagement (%)</label>
+                                    <input type="number" class="form-control" id="engagement" placeholder="Otomatis terhitung" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Engagement rate dihitung otomatis berdasarkan rumus: (Like + Komentar + Save + Share + Penambahan Followers) / View * 100
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Simpan Data
+                            </button>
+                        </form>
+                        
+                        <div class="analysis-result mt-4" id="analysisResult" style="display: none;">
+                            <h6>Hasil Analisis Konten</h6>
+                            <div id="analysisText"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 2: Rekap Konten PMB 2026 -->
+            <div id="page2" class="page">
+                <!-- Profil IG PMB Card -->
+                <div class="profile-card">
+                    <div class="profile-icon">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <div class="profile-username">@PMB_UAD</div>
+                    <div class="followers-count" id="currentFollowers">61,135</div>
+                    <div class="text-muted">Followers</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Rekap Data Konten PMB 2026</h5>
+                        <div class="filter-container">
+                            <select class="form-select form-select-sm" id="filterMonth">
+                                <option value="all">Semua Bulan</option>
+                                <option value="Januari">Januari</option>
+                                <option value="Februari">Februari</option>
+                                <option value="Maret">Maret</option>
+                                <option value="April">April</option>
+                                <option value="Mei">Mei</option>
+                                <option value="Juni">Juni</option>
+                                <option value="Juli">Juli</option>
+                                <option value="Agustus">Agustus</option>
+                                <option value="September">September</option>
+                                <option value="Oktober">Oktober</option>
+                                <option value="November">November</option>
+                                <option value="Desember">Desember</option>
+                            </select>
+                            <select class="form-select form-select-sm" id="filterYear">
+                                <option value="all">Semua Tahun</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card posts">
+                                    <i class="fas fa-file-alt fa-2x"></i>
+                                    <div class="stat-value" id="totalPosts">0</div>
+                                    <div>Jumlah Postingan</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card likes">
+                                    <i class="fas fa-thumbs-up fa-2x"></i>
+                                    <div class="stat-value" id="totalLikes">0</div>
+                                    <div>Jumlah Like</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card comments">
+                                    <i class="fas fa-comments fa-2x"></i>
+                                    <div class="stat-value" id="totalComments">0</div>
+                                    <div>Jumlah Komentar</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card followers">
+                                    <i class="fas fa-users fa-2x"></i>
+                                    <div class="stat-value" id="totalFollowers">0</div>
+                                    <div>Total Penambahan Followers</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="stat-card saves">
+                                    <i class="fas fa-bookmark fa-2x"></i>
+                                    <div class="stat-value" id="totalSaves">0</div>
+                                    <div>Jumlah Save</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card shares">
+                                    <i class="fas fa-share-alt fa-2x"></i>
+                                    <div class="stat-value" id="totalShares">0</div>
+                                    <div>Jumlah Share</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card views">
+                                    <i class="fas fa-eye fa-2x"></i>
+                                    <div class="stat-value" id="totalViews">0</div>
+                                    <div>Jumlah View</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #00cec9, #00b894);">
+                                    <i class="fas fa-chart-line fa-2x"></i>
+                                    <div class="stat-value" id="avgEngagement">0%</div>
+                                    <div>Rata-rata Engagement</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive mt-4">
+                            <table class="table table-striped table-hover" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal</th>
+                                        <th>Bulan</th>
+                                        <th>Tahun</th>
+                                        <th>Link</th>
+                                        <th>Like</th>
+                                        <th>Komentar</th>
+                                        <th>Save</th>
+                                        <th>Share</th>
+                                        <th>Followers</th>
+                                        <th>View</th>
+                                        <th>Engagement</th>
+                                        <th>Kualitas</th>
+                                        <th id="actionHeader" style="display: none;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contentTable">
+                                    <!-- Data akan diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="action-buttons" id="actionButtons" style="display: none;">
+                            <button class="btn btn-success" id="downloadBtn">
+                                <i class="fas fa-file-excel me-2"></i>Download Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 3: Pengaturan -->
+            <div id="page3" class="page">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Pengaturan Sistem</h5>
+                        <i class="fas fa-cog text-primary"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="edit-followers-form">
+                            <h6 class="mb-3">Edit Jumlah Followers</h6>
+                            <form id="followersForm">
+                                <div class="mb-3">
+                                    <label for="newFollowers" class="form-label">Jumlah Followers Baru</label>
+                                    <input type="number" class="form-control" id="newFollowers" placeholder="Masukkan jumlah followers" min="0" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-save me-2"></i>Update Followers
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data konten (simulasi database)
+        let contentData = JSON.parse(localStorage.getItem('contentData')) || [];
+        let currentFollowers = localStorage.getItem('currentFollowers') || 61135;
+        let isAdmin = false;
+        
+        // Elemen DOM
+        const loginPage = document.getElementById('loginPage');
+        const app = document.getElementById('app');
+        const loginForm = document.getElementById('loginForm');
+        const logoutLink = document.getElementById('logoutLink');
+        const userRoleDisplay = document.getElementById('userRoleDisplay');
+        const navTabsContainer = document.getElementById('navTabsContainer');
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const pages = document.querySelectorAll('.page');
+        const form = document.getElementById('contentForm');
+        const analysisResult = document.getElementById('analysisResult');
+        const analysisText = document.getElementById('analysisText');
+        const contentTable = document.getElementById('contentTable');
+        const totalPostsEl = document.getElementById('totalPosts');
+        const totalLikesEl = document.getElementById('totalLikes');
+        const totalCommentsEl = document.getElementById('totalComments');
+        const totalFollowersEl = document.getElementById('totalFollowers');
+        const totalSavesEl = document.getElementById('totalSaves');
+        const totalSharesEl = document.getElementById('totalShares');
+        const totalViewsEl = document.getElementById('totalViews');
+        const avgEngagementEl = document.getElementById('avgEngagement');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const filterMonth = document.getElementById('filterMonth');
+        const filterYear = document.getElementById('filterYear');
+        const daySelect = document.getElementById('day');
+        const engagementInput = document.getElementById('engagement');
+        const likeInput = document.getElementById('like');
+        const commentsInput = document.getElementById('comments');
+        const savesInput = document.getElementById('saves');
+        const sharesInput = document.getElementById('shares');
+        const followersInput = document.getElementById('followers');
+        const viewInput = document.getElementById('view');
+        const currentFollowersEl = document.getElementById('currentFollowers');
+        const actionButtons = document.getElementById('actionButtons');
+        const actionHeader = document.getElementById('actionHeader');
+        const followersForm = document.getElementById('followersForm');
+        
+        // Inisialisasi
+        function init() {
+            // Isi dropdown tanggal dengan angka 1-31
+            for (let i = 1; i <= 31; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+            
+            // Update tampilan followers
+            updateFollowersDisplay();
+            
+            // Jika ada data konten, update rekap data
+            if (contentData.length > 0) {
+                updateRecapData();
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Event listener untuk menghitung engagement otomatis
+            likeInput.addEventListener('input', calculateEngagement);
+            commentsInput.addEventListener('input', calculateEngagement);
+            savesInput.addEventListener('input', calculateEngagement);
+            sharesInput.addEventListener('input', calculateEngagement);
+            followersInput.addEventListener('input', calculateEngagement);
+            viewInput.addEventListener('input', calculateEngagement);
+            
+            // Event listener untuk login
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Event listener untuk logout
+            logoutLink.addEventListener('click', handleLogout);
+            
+            // Event listener untuk update followers
+            followersForm.addEventListener('submit', updateFollowers);
+            
+            // Event listener untuk navigasi tab
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetPage = tab.getAttribute('data-page');
+                    
+                    // Update nav tab aktif
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Tampilkan halaman yang sesuai
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                        if (page.id === targetPage) {
+                            page.classList.add('active');
+                            
+                            // Jika pindah ke halaman 2, update data rekap
+                            if (targetPage === 'page2') {
+                                updateRecapData();
+                            }
+                        }
+                    });
+                });
+            });
+            
+            // Event listener untuk submit form konten
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Ambil nilai dari form
+                const day = document.getElementById('day').value;
+                const month = document.getElementById('month').value;
+                const year = document.getElementById('year').value;
+                const link = document.getElementById('link').value;
+                const like = parseInt(document.getElementById('like').value);
+                const comments = parseInt(document.getElementById('comments').value);
+                const saves = parseInt(document.getElementById('saves').value);
+                const shares = parseInt(document.getElementById('shares').value);
+                const followers = parseInt(document.getElementById('followers').value);
+                const view = parseInt(document.getElementById('view').value);
+                const engagement = parseFloat(document.getElementById('engagement').value);
+                
+                // Validasi input
+                if (!day || !month || !year) {
+                    showNotification('Harap lengkapi tanggal, bulan, dan tahun!', 'warning');
+                    return;
+                }
+                
+                // Analisis konten
+                const { analysis, quality, qualityClass } = analyzeContent(like, comments, saves, shares, followers, view, engagement);
+                
+                // Tampilkan hasil analisis
+                analysisText.innerHTML = `
+                    <p><strong>Kualitas Konten:</strong> <span class="badge-quality ${qualityClass}">${quality}</span></p>
+                    <p>${analysis}</p>
+                `;
+                analysisResult.style.display = 'block';
+                
+                // Simpan data
+                const content = {
+                    id: Date.now(),
+                    day,
+                    month,
+                    year,
+                    link,
+                    like,
+                    comments,
+                    saves,
+                    shares,
+                    followers,
+                    view,
+                    engagement,
+                    quality,
+                    qualityClass,
+                    timestamp: new Date().toISOString()
+                };
+                
+                contentData.push(content);
+                localStorage.setItem('contentData', JSON.stringify(contentData));
+                
+                // Reset form
+                form.reset();
+                engagementInput.value = '';
+                
+                // Tampilkan notifikasi sukses
+                showNotification('Data berhasil disimpan!', 'success');
+            });
+            
+            // Event listener untuk filter bulan dan tahun
+            filterMonth.addEventListener('change', updateRecapData);
+            filterYear.addEventListener('change', updateRecapData);
+            
+            // Event listener untuk download data ke Excel
+            downloadBtn.addEventListener('click', function() {
+                if (contentData.length === 0) {
+                    showNotification('Tidak ada data untuk didownload!', 'warning');
+                    return;
+                }
+                
+                // Siapkan data untuk Excel
+                const excelData = contentData.map(item => {
+                    return {
+                        'Tanggal': item.day,
+                        'Bulan': item.month,
+                        'Tahun': item.year,
+                        'Link': item.link,
+                        'Like': item.like,
+                        'Komentar': item.comments,
+                        'Save': item.saves,
+                        'Share': item.shares,
+                        'Penambahan Followers': item.followers,
+                        'View': item.view,
+                        'Engagement (%)': item.engagement,
+                        'Kualitas': item.quality
+                    };
+                });
+                
+                // Buat worksheet
+                const ws = XLSX.utils.json_to_sheet(excelData);
+                
+                // Buat workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Data Konten PMB 2026");
+                
+                // Download file
+                XLSX.writeFile(wb, "Rekap_Konten_PMB_2026.xlsx");
+                
+                showNotification('File Excel berhasil didownload!', 'success');
+            });
+        }
+        
+        // Fungsi untuk menghitung engagement rate
+        function calculateEngagement() {
+            const like = parseInt(likeInput.value) || 0;
+            const comments = parseInt(commentsInput.value) || 0;
+            const saves = parseInt(savesInput.value) || 0;
+            const shares = parseInt(sharesInput.value) || 0;
+            const followers = parseInt(followersInput.value) || 0;
+            const view = parseInt(viewInput.value) || 0;
+            
+            if (view > 0) {
+                const engagementRate = ((like + comments + saves + shares + followers) / view) * 100;
+                engagementInput.value = engagementRate.toFixed(2);
+            } else {
+                engagementInput.value = '';
+            }
+        }
+        
+        // Fungsi untuk menganalisis konten
+        function analyzeContent(like, comments, saves, shares, followers, view, engagement) {
+            let analysis = "";
+            let quality = "";
+            let qualityClass = "";
+            
+            // Analisis berdasarkan engagement rate
+            if (engagement >= 10) {
+                analysis = "Konten memiliki engagement rate yang sangat tinggi. Pertahankan kualitas konten seperti ini!";
+                quality = "Sangat Bagus";
+                qualityClass = "badge-excellent";
+            } else if (engagement >= 6) {
+                analysis = "Konten memiliki engagement rate yang baik. Coba tingkatkan lagi dengan konten yang lebih menarik.";
+                quality = "Bagus";
+                qualityClass = "badge-good";
+            } else if (engagement >= 3) {
+                analysis = "Engagement rate sedang. Coba analisis konten yang lebih disukai audiens.";
+                quality = "Cukup";
+                qualityClass = "badge-fair";
+            } else {
+                analysis = "Engagement rate rendah. Perlu evaluasi strategi konten dan penyesuaian dengan minat audiens.";
+                quality = "Perlu Perbaikan";
+                qualityClass = "badge-poor";
+            }
+            
+            return { analysis, quality, qualityClass };
+        }
+        
+        // Fungsi untuk menghapus data berdasarkan ID
+        function deleteContent(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                // Filter data yang tidak termasuk ID yang dipilih
+                contentData = contentData.filter(item => item.id !== id);
+                localStorage.setItem('contentData', JSON.stringify(contentData));
+                
+                // Update tampilan
+                updateRecapData();
+                
+                showNotification('Data berhasil dihapus!', 'success');
+            }
+        }
+        
+        // Fungsi untuk memperbarui data rekap
+        function updateRecapData() {
+            const selectedMonth = filterMonth.value;
+            const selectedYear = filterYear.value;
+            
+            // Filter data berdasarkan bulan dan tahun jika dipilih
+            const filteredData = contentData.filter(item => {
+                const monthMatch = selectedMonth === 'all' || item.month === selectedMonth;
+                const yearMatch = selectedYear === 'all' || item.year === selectedYear;
+                return monthMatch && yearMatch;
+            });
+            
+            // Hitung statistik
+            const totalPosts = filteredData.length;
+            const totalLikes = filteredData.reduce((sum, item) => sum + item.like, 0);
+            const totalComments = filteredData.reduce((sum, item) => sum + item.comments, 0);
+            const totalFollowers = filteredData.reduce((sum, item) => sum + item.followers, 0);
+            const totalSaves = filteredData.reduce((sum, item) => sum + item.saves, 0);
+            const totalShares = filteredData.reduce((sum, item) => sum + item.shares, 0);
+            const totalViews = filteredData.reduce((sum, item) => sum + item.view, 0);
+            const totalEngagement = filteredData.reduce((sum, item) => sum + item.engagement, 0);
+            const avgEngagement = totalPosts > 0 ? (totalEngagement / totalPosts).toFixed(2) : 0;
+            
+            // Update elemen statistik
+            totalPostsEl.textContent = totalPosts;
+            totalLikesEl.textContent = totalLikes.toLocaleString();
+            totalCommentsEl.textContent = totalComments.toLocaleString();
+            totalFollowersEl.textContent = totalFollowers.toLocaleString();
+            totalSavesEl.textContent = totalSaves.toLocaleString();
+            totalSharesEl.textContent = totalShares.toLocaleString();
+            totalViewsEl.textContent = totalViews.toLocaleString();
+            avgEngagementEl.textContent = `${avgEngagement}%`;
+            
+            // Update tabel
+            contentTable.innerHTML = '';
+            filteredData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.day}</td>
+                    <td>${item.month}</td>
+                    <td>${item.year}</td>
+                    <td><a href="${item.link}" target="_blank">${item.link.substring(0, 30)}...</a></td>
+                    <td>${item.like.toLocaleString()}</td>
+                    <td>${item.comments.toLocaleString()}</td>
+                    <td>${item.saves.toLocaleString()}</td>
+                    <td>${item.shares.toLocaleString()}</td>
+                    <td>${item.followers.toLocaleString()}</td>
+                    <td>${item.view.toLocaleString()}</td>
+                    <td>${item.engagement.toFixed(2)}%</td>
+                    <td><span class="badge-quality ${item.qualityClass}">${item.quality}</span></td>
+                    ${isAdmin ? `<td>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>` : ''}
+                `;
+                
+                contentTable.appendChild(row);
+            });
+            
+            // Tambahkan event listener untuk tombol hapus (hanya untuk admin)
+            if (isAdmin) {
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteContent(id);
+                    });
+                });
+            }
+        }
+        
+        // Fungsi untuk update tampilan followers
+        function updateFollowersDisplay() {
+            currentFollowersEl.textContent = parseInt(currentFollowers).toLocaleString();
+        }
+        
+        // Fungsi untuk update followers
+        function updateFollowers(e) {
+            e.preventDefault();
+            const newFollowers = document.getElementById('newFollowers').value;
+            
+            if (!newFollowers) {
+                showNotification('Harap masukkan jumlah followers baru!', 'warning');
+                return;
+            }
+            
+            currentFollowers = newFollowers;
+            localStorage.setItem('currentFollowers', currentFollowers);
+            updateFollowersDisplay();
+            document.getElementById('newFollowers').value = '';
+            
+            showNotification('Jumlah followers berhasil diperbarui!', 'success');
+        }
+        
+        // Fungsi untuk menangani login
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Validasi login
+            if (username === 'admin' && password === 'admin123') {
+                isAdmin = true;
+                userRoleDisplay.textContent = 'Admin';
+                showApp();
+                showNotification('Login berhasil sebagai Admin!', 'success');
+            } else if (username === 'user' && password === 'user123') {
+                isAdmin = false;
+                userRoleDisplay.textContent = 'User';
+                showApp();
+                showNotification('Login berhasil sebagai User!', 'success');
+            } else {
+                showNotification('Username atau password salah!', 'error');
+                return;
+            }
+            
+            // Atur hak akses berdasarkan role
+            setupAccessControl();
+        }
+        
+        // Fungsi untuk menangani logout
+        function handleLogout(e) {
+            e.preventDefault();
+            isAdmin = false;
+            loginPage.style.display = 'block';
+            app.style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            showNotification('Anda telah logout!', 'info');
+        }
+        
+        // Fungsi untuk menampilkan aplikasi utama
+        function showApp() {
+            loginPage.style.display = 'none';
+            app.style.display = 'block';
+        }
+        
+        // Fungsi untuk mengatur kontrol akses
+        function setupAccessControl() {
+            // Tampilkan/sembunyikan elemen berdasarkan role
+            if (isAdmin) {
+                // Admin dapat mengakses semua halaman
+                actionButtons.style.display = 'flex';
+                actionHeader.style.display = 'table-cell';
+            } else {
+                // User hanya dapat melihat halaman rekap data
+                document.getElementById('page1').style.display = 'none';
+                document.getElementById('page3').style.display = 'none';
+                actionButtons.style.display = 'none';
+                actionHeader.style.display = 'none';
+                
+                // Pastikan halaman 2 aktif
+                navTabs.forEach(t => t.classList.remove('active'));
+                document.querySelector('[data-page="page2"]').classList.add('active');
+                pages.forEach(page => page.classList.remove('active'));
+                document.getElementById('page2').classList.add('active');
+                
+                // Sembunyikan tab yang tidak boleh diakses user
+                document.querySelector('[data-page="page1"]').style.display = 'none';
+                document.querySelector('[data-page="page3"]').style.display = 'none';
+            }
+            
+            // Update data rekap
+            updateRecapData();
+        }
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type) {
+            // Buat elemen notifikasi
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Tambahkan ke body
+            document.body.appendChild(notification);
+            
+            // Hapus notifikasi setelah 3 detik
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+        
+        // Jalankan inisialisasi
+        init();
+    </script>
+</body>
+</html>
